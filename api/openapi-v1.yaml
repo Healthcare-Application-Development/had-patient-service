@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: CMS Service
+  version: 1.0.11
+servers:
+  - url: http://localhost:9765
+
+paths:
+  /patient/request-all-consent/{patientID}:
+    get:
+      tags:
+        - consent request
+      summary: Patients get all consent requests
+      description: Patient can view consent requests
+      operationId: getConsentRequests
+      parameters:
+        - name: patientID
+          in: path
+          description: ID of patient to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/consentRequestsResponse'          
+        '405':
+          description: Invalid input
+          
+  /patient/consent-response:
+    post:
+      tags:
+        - consent response
+      summary: Patients accept, modify and accept or reject consent requests
+      description: Patients accept or reject consent requests
+      operationId: setConsentResponse
+      requestBody:
+        description: send consent request based on patient ABHA ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patientConsentResponse'
+              
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patientConsentAck'
+                  
+        '405':
+          description: Invalid input
+
+
+components:
+  schemas:
+    consentRequestsResponse:
+      type: object
+      properties:
+        consentArtifactId:
+          type: string
+          format: string
+          example: "19"
+        doctorId:
+          type: string
+          format: string
+          example: "h1-d1"
+        requests:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/consentArtifactItems'
+    consentArtifactItems:
+          type: object
+          properties:
+            category:
+              type: string
+              format: string
+              example: "blood report"
+            from:
+              type: string
+              format: date
+              example: '2022-07-01'
+            to:
+              type: string
+              format: date
+              example: '2022-07-01'
+            hospital:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: string
+                  example: "h1"
+                name:
+                  type: string
+                  format: string
+                  example: "hospital 1"
+    patientConsentResponse:
+        type: object
+        properties:
+          consentArtifact:
+            type: object
+            $ref: '#/components/schemas/consentArtifactItems'
+          ABHA_ID:
+            type: string
+            example: "122345"
+            format: string
+          choice:
+            type: string
+            example: accept
+            enum: [accept, reject]
+    
+    patientConsentAck:
+        type: object
+        properties:
+          acknowledgement:
+            type: boolean
+            format: boolean
+            example: true

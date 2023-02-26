@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: CMS Service
+  title: Patient Service
   version: 1.0.11
 servers:
   - url: http://localhost:9765
@@ -28,7 +28,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/consentRequestsResponse'          
-        '405':
+        '404':
           description: Invalid input
           
   /patient/consent-response:
@@ -54,7 +54,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/patientConsentAck'
                   
-        '405':
+        '404':
           description: Invalid input
 
 
@@ -63,19 +63,27 @@ components:
     consentRequestsResponse:
       type: object
       properties:
-        consentArtifactId:
-          type: string
-          format: string
-          example: "19"
-        doctorId:
-          type: string
-          format: string
-          example: "h1-d1"
-        requests:
+        patient_id:
+          type: integer
+          example : 1
+        consents:
           type: array
           items:
-            anyOf:
-              - $ref: '#/components/schemas/consentArtifactItems'
+            type: object
+            properties:
+              consentArtifactId:
+                type: string
+                format: string
+                example: "19"
+              doctorId:
+                type: string
+                format: string
+                example: "h1-d1"
+              requests:
+                type: array
+                items:
+                  anyOf:
+                    - $ref: '#/components/schemas/consentArtifactItems'
     consentArtifactItems:
           type: object
           properties:
@@ -91,7 +99,18 @@ components:
               type: string
               format: date
               example: '2022-07-01'
-            hospital:
+            source_hid:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: string
+                  example: "h1"
+                name:
+                  type: string
+                  format: string
+                  example: "hospital 2"
+            dest_hospital:
               type: object
               properties:
                 id:
